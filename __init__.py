@@ -1,6 +1,6 @@
 from invoke import Collection, Config, task
 
-from . import ansible, aws, docker
+from . import git, ansible, aws, docker
 
 from os import environ, path, getcwd
 from configparser import ConfigParser
@@ -71,6 +71,7 @@ ns.configure(
         # "ANSIBLE_INVENTORY_FILE": ANSIBLE_INVENTORY_FILE,
     }
 )
+ns.add_collection(git)
 ns.add_collection(ansible)
 ns.add_collection(aws)
 ns.add_collection(docker)
@@ -79,11 +80,17 @@ ns.add_collection(docker)
 # Add tasks to main Collection
 @task(iterable=["names"])
 def hello(c, names):
-    for key in c:
-        print(key)
-
+    """Say hello to someone."""
     for name in names:
         print(f"Hello {name}!")
 
 
+@task
+def debug(c):
+    """Print the current configuration."""
+    for k, v in c.config.items():
+        print(f"{k}={v}")
+
+
 ns.add_task(hello)
+ns.add_task(debug)
