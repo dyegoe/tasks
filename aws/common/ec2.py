@@ -1,3 +1,27 @@
+AMI_NAMES = {
+    "amzn2-x86_64": {
+        "owner": "amazon",
+        "filters": [{"Name": "name", "Values": ["amzn2-ami-hvm-*-x86_64-gp2"]}],
+    },
+    "amzn2-arm64": {
+        "owner": "amazon",
+        "filters": [{"Name": "name", "Values": ["amzn2-ami-hvm-*-arm64-gp2"]}],
+    },
+    "amzn2-kernel-5-x86_64": {
+        "owner": "amazon",
+        "filters": [
+            {"Name": "name", "Values": ["amzn2-ami-kernel-5.10-hvm-*-x86_64-gp2"]}
+        ],
+    },
+    "amzn2-kernel-5-arm64": {
+        "owner": "amazon",
+        "filters": [
+            {"Name": "name", "Values": ["amzn2-ami-kernel-5.10-hvm-*-arm64-gp2"]}
+        ],
+    },
+}
+
+
 def get_ec2_instances_by_ids(session, instance_ids):
     """Get all EC2 instances with a specific instance ID.
 
@@ -77,6 +101,24 @@ def get_ec2_instances_by_public_ips(session, public_ips):
         response = client.describe_instances(
             Filters=[{"Name": "ip-address", "Values": public_ips}]
         )
+        return response
+    except Exception:
+        return None
+
+
+def get_amis(session, owner_ids, filters):
+    """Get all AMIs with a specific owner ID.
+
+    Args:
+        session (botocore_session): AWS session.
+        owner_ids (list): List of owner IDs.
+
+    Returns:
+        list: List of AMIs.
+    """
+    client = session.client("ec2")
+    try:
+        response = client.describe_images(Owners=owner_ids, Filters=filters)
         return response
     except Exception:
         return None

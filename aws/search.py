@@ -83,6 +83,35 @@ def ec2_public_ips(c, public_ips, profile="default", region=None, output="table"
 #     )
 
 
+# AMIs tasks
+@task(
+    help={
+        "name": "Predefined AMI name. Options: {}.".format(
+            [k for k in common.ec2.AMI_NAMES]
+        )
+    }
+)
+def ami_name(c, name, profile="default", region=None, output="table"):
+    """Get AMIs by name."""
+    try:
+        ami_name = common.ec2.AMI_NAMES[name]
+    except KeyError:
+        print(
+            "Invalid AMI option. Options available: {}".format(
+                [k for k in common.ec2.AMI_NAMES]
+            )
+        )
+        return
+    common.aws_search(
+        profile,
+        common.get_region(c, region),
+        output,
+        common.ec2.get_amis,
+        owner_ids=[ami_name["owner"]],
+        filters=ami_name["filters"],
+    )
+
+
 # ENI tasks
 @task
 def eni_private_ips(c, private_ips, profile="default", region=None, output="table"):
@@ -155,6 +184,10 @@ ec2.add_task(ec2_names, "names")
 ec2.add_task(ec2_tag, "tag")
 ec2.add_task(ec2_private_ips, "private-ips")
 ec2.add_task(ec2_public_ips, "public-ips")
+
+ami = Collection("ami")
+ns.add_collection(ami)
+ami.add_task(ami_name, "name")
 
 eni = Collection("eni")
 ns.add_collection(eni)

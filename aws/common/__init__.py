@@ -56,39 +56,48 @@ def aws_search(profile_name, region_name, output, func, **kwargs):
         if session is not None:
             response = func(session, **kwargs)
             if response is not None:
-                table_data = deserialize.deserialize(response)
+                data = deserialize.deserialize(response)
                 print_data(
-                    table_data, session.profile_name, session.region_name, output
+                    profile=session.profile_name,
+                    region=session.region_name,
+                    data=data,
+                    output=output,
                 )
         else:
             continue
 
 
-def print_data(table_data, profile_name, region_name, output):
+def print_data(profile, region, data, output):
     """Print the data in a table.
 
     Args:
-        table_data (dict): dict of AWS resources.
-        profile_name (string): AWS profile name.
-        region_name (string): AWS region name.
+        profile (string): AWS profile name.
+        region (string): AWS region name.
+        data (dict): dict of AWS resources.
         output (string): output format. You can choose between table, json.
     """
     if output == "table":
         print(
             "[+] Session created for profile '{}' and region '{}'".format(
-                profile_name, region_name
+                profile, region
             )
         )
-        print(tabulate(table_data, headers="keys", tablefmt="pretty"))
+        print(
+            tabulate(
+                data,
+                headers="keys",
+                tablefmt="pretty",
+            )
+        )
     elif output == "json":
         print(
             json.dumps(
                 {
-                    "profile": profile_name,
-                    "region": region_name,
-                    "data": table_data,
+                    "profile": profile,
+                    "region": region,
+                    "data": data,
                 },
-                indent=4,
+                indent=2,
             )
         )
 

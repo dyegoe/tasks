@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import pandas as pd
 
 
 def find_tag_name(instance):
@@ -17,21 +18,22 @@ def find_tag_name(instance):
     return None
 
 
-def deserialize(response):
-    """Deserialize the response.
+def sort_data(data, order, ascending):
+    """Sort the data by the provided column.
 
     Args:
-        response (dict): dict of AWS resources.
+        data (dict): dict of AWS resources.
+        order (list): list of columns to sort by.
+        ascending (list): list of booleans to sort by.
 
     Returns:
-        dict: dict of AWS resources.
+        dict: sorted dict of AWS resources.
     """
-    if "Reservations" in response:
-        return deserialize_ec2_instances(response)
-    elif "NetworkInterfaces" in response:
-        return deserialize_enis(response)
-    elif "LoadBalancers" in response:
-        return deserialize_elbs(response)
+    if len(data) < 1:
+        return data
+    df = pd.DataFrame(data)
+    df.sort_values(by=order, ascending=ascending, inplace=True)
+    return df.to_dict(orient="records")
 
 
 def deserialize_ec2_instances(response):
@@ -64,7 +66,7 @@ def deserialize_ec2_instances(response):
                     ]
                 )
             )
-    return instances
+    return sort_data(instances, ["InstanceState", "InstanceName"], [True, True])
 
 
 def deserialize_enis(response):
@@ -91,15 +93,16 @@ def deserialize_enis(response):
                 ]
             )
         )
-    return enis
+    return sort_data(
+        enis, ["Status", "InterfaceType", "InstanceId"], [True, True, True]
+    )
 
 
-def deserialize_elbs(response, dns_names=None):
+def deserialize_elbs(response):
     """Deserialize the ELBs response.
 
     Args:
         response (dict): dict of ELBs.
-        dns_names (list, optional): list of DNS names. Defaults to None.
 
     Returns:
         dict: dict of ELBs.
@@ -117,4 +120,49 @@ def deserialize_elbs(response, dns_names=None):
                 ]
             )
         )
-    return elbs
+    return sort_data(elbs, ["LoadBalancerName"], [True])
+
+
+def deserialize_images(response):
+    """Deserialize the images response.
+
+    Args:
+        response (dict): dict of images.
+
+    Returns:
+        dict: dict of images.
+    """
+    images = []
+    for image in response["Images"]:
+        images.append(
+            OrderedDict(
+                [
+                    ("ImageId", image.get("ImageId", None)),
+                    ("Name", image.get("Name", None)),
+                    ("CreationDate", image.get("CreationDate", None)),
+                ]
+            )
+        )
+    return sort_data(images, ["CreationDate"], [False])
+
+
+def deserialize(response):
+    """Deserialize the response.
+
+    Args:
+        response (dict): dict of AWS resources.
+
+    Returns:
+        dict: dict of AWS resources.
+    """
+    if "Reservations" in response:
+        return deserialize_ec2_instances(response)
+    elif "NetworkInterfaces" in response:
+        return deserialize_enis(response)
+    elif "LoadBalancers" in response:
+        return deserialize_elbs(response)
+    elif "Images" in response:
+        return deserialize_images(response)
+    else:
+        print(response)
+        return None
