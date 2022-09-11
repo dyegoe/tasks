@@ -11,10 +11,13 @@ CURRENT_DIR = getcwd()
 
 # Load invoke configuration if it exists
 c = Config()
-invoke_config = f"{CURRENT_DIR}/invoke.yaml"
-if path.isfile(invoke_config):
-    c.set_runtime_path(invoke_config)
-    c.load_runtime()
+invoke_files = ["invoke.yaml", "invoke.yml", "invoke.json"]
+for f in invoke_files:
+    invoke_config = f"{CURRENT_DIR}/invoke.yaml"
+    if path.isfile(invoke_config):
+        c.set_runtime_path(invoke_config)
+        c.load_runtime()
+        break
 
 # Set the SSH key to use
 SSH_PRIVATE_KEY_EXPAND = path.expanduser(c.get("SSH_PRIVATE_KEY", "~/.ssh/id_rsa"))

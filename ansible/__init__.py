@@ -17,8 +17,9 @@ def playbook(c, playbook, inventory=None, *args):
     except KeyError as k:
         raise SystemExit(f"You must specify '--inventory' or set {k} in invoke.yaml")
 
-    print(
-        f"ansible-playbook -i {inventory_file} -e ansible_ssh_private_key_file={c['SSH_PRIVATE_KEY_EXPAND']} {playbook} {' '.join(args)}"
+    c.run(
+        f"ansible-playbook -i {inventory_file} -e ansible_ssh_private_key_file={c['SSH_PRIVATE_KEY_EXPAND']} {playbook} {' '.join(args)}",
+        pty=True,
     )
 
 
