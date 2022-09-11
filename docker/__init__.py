@@ -14,15 +14,15 @@ def build(c):
 
 
 @task
-def run(c, local=False, aws=True, ssh=True):
+def run(c, local=False, aws=True, ssh=True, workdir=True):
     """Run the Docker image.
     This function expects the following 'invoke' variables to be set:
     - DOCKER_IMAGE_NAME
     - DOCKER_IMAGE_TAG
     - DOCKER_CONTAINER_NAME
     - DOCKER_CONTAINER_WORKDIR"""
-    print(f"Running {c['DOCKER_IMAGE_NAME']}:{c['DOCKER_IMAGE_TAG']}")
     mount_local = "" if not local else f"-v {c['CURRENT_DIR']}:/ansible"
+    workdir = "" if not workdir else f"-w {c['DOCKER_CONTAINER_WORKDIR']}"
     aws_access_key_id = (
         "" if not aws else f"-e AWS_ACCESS_KEY_ID={c['AWS_ACCESS_KEY_ID']}"
     )
@@ -32,7 +32,7 @@ def run(c, local=False, aws=True, ssh=True):
     ssh_private_key = (
         "" if not ssh else f"-v {c['SSH_PRIVATE_KEY_EXPAND']}:/root/.ssh/id_rsa"
     )
-    workdir = c.get("DOCKER_CONTAINER_WORKDIR", "/root")
+    print(f"Running {c['DOCKER_IMAGE_NAME']}:{c['DOCKER_IMAGE_TAG']}")
     c.run(
         " ".join(
             [
