@@ -1,0 +1,7 @@
+---
+DOCKER_CONTAINER_NAME: "tasks"
+DOCKER_IMAGE_NAME: "tasks"
+DOCKER_IMAGE_TAG: "0.1.0"
+DOCKER_CONTAINER_WORKDIR: "/tasks"
+SSH_PRIVATE_KEY: ~/.ssh/id_rsa
+ANSIBLE_INVENTORY_FILE: "examples/inventory.yaml"

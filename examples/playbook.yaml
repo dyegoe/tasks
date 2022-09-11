@@ -1,0 +1,7 @@
+---
+- name: Plabook example
+  hosts: localhost
+  tasks:
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "Hello World"
