@@ -3,8 +3,8 @@ from invoke import Collection, task
 ns = Collection("ansible")
 
 
-@task
-def playbook(c, playbook, inventory=None, *args):
+@task(iterable=["args"])
+def playbook(c, playbook, inventory=None, args=None):
     """Run an Ansible playbook.
     This task expects the following 'invoke.yaml' variables to be set:
     - ANSIBLE_PLAYBOOKS_DIR
@@ -29,10 +29,12 @@ def play_deploy_stag(c):  ## Runs playbook/deploy_apps.yml -e env=stag
     print("Running playbook/deploy_apps.yml -e env=stag")
     playbook(
         c,
-        "playbooks/deploy_apps.yml",
-        "-e @examples/deploy.yml",
-        "-e env=stag",
-        f"-e registry_password={c['REGISTRY_PASSWORD']}",
+        playbook="playbooks/deploy_apps.yml",
+        args=[
+            "-e @examples/deploy.yml",
+            "-e env=stag",
+            f"-e registry_password={c['REGISTRY_PASSWORD']}",
+        ],
     )
 
 
@@ -42,10 +44,12 @@ def play_deploy_prod(c):  ## Runs playbook/deploy_apps.yml -e env=prod
     print("Running playbook/deploy_apps.yml -e env=prod")
     playbook(
         c,
-        "playbooks/deploy_apps.yml",
-        "-e @examples/deploy.yml",
-        "-e env=prod",
-        f"-e registry_password={c['REGISTRY_PASSWORD']}",
+        playbook="playbooks/deploy_apps.yml",
+        args=[
+            "-e @examples/deploy.yml",
+            "-e env=prod",
+            f"-e registry_password={c['REGISTRY_PASSWORD']}",
+        ],
     )
 
 
