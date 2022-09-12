@@ -13,7 +13,7 @@ CURRENT_DIR = getcwd()
 c = Config()
 invoke_files = ["invoke.yaml", "invoke.yml", "invoke.json"]
 for f in invoke_files:
-    invoke_config = f"{CURRENT_DIR}/invoke.yaml"
+    invoke_config = f"{CURRENT_DIR}/{f}"
     if path.isfile(invoke_config):
         c.set_runtime_path(invoke_config)
         c.load_runtime()
@@ -68,7 +68,7 @@ ns.configure(
         "DOCKER_IMAGE_TAG": DOCKER_IMAGE_TAG,
         "DOCKER_CONTAINER_WORKDIR": DOCKER_CONTAINER_WORKDIR,
         "SSH_PRIVATE_KEY": SSH_PRIVATE_KEY,
-        # "ANSIBLE_INVENTORY_FILE": ANSIBLE_INVENTORY_FILE,
+        "ANSIBLE_INVENTORY_FILE": ANSIBLE_INVENTORY_FILE,
     }
 )
 ns.add_collection(git)
